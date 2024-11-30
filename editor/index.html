@@ -130,8 +130,11 @@
     </div>
 
     <script>
+        // URL for your Lambda function's API Gateway endpoint (replace with actual URL)
+        const apiUrl = 'https://warm-profiterole-c9b45a.netlify.app/.netlify/functions/add_posts/';
+
         // Handle form submission
-        document.getElementById('blog-form').addEventListener('submit', function(event) {
+        document.getElementById('blog-form').addEventListener('submit', async function(event) {
             event.preventDefault();
             
             // Get form data
@@ -139,14 +142,38 @@
             const description = document.getElementById('description').value;
             const content = document.getElementById('content').value;
 
-            // Handle form data (for now, just log to the console)
-            console.log("Blog Post Submitted:");
-            console.log("Title:", title);
-            console.log("Description:", description);
-            console.log("Content:", content);
-            
-            alert('Your post has been saved!');
-            // Reset form
+            // Prepare the payload
+            const postData = {
+                title: title,
+                description: description,
+                content: content
+            };
+
+            // Send the data to the API using fetch
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(postData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Your post has been saved successfully!');
+                    console.log(data); // Optional: Log the response data
+                } else {
+                    alert('There was an error saving your post.');
+                    console.error(data); // Log error message
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while saving your post.');
+            }
+
+            // Reset form after submission
             this.reset();
         });
 
