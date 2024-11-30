@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -27,9 +28,11 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 		os.Exit(1)
 	}
 	defer db.Close()
-	title := request.QueryStringParameters["title"]
-	description := request.QueryStringParameters["description"]
-	content := request.QueryStringParameters["content"]
+	blogPayload := Blog{}
+	json.Unmarshal([]byte(request.Body), &blogPayload)
+	title := blogPayload.Title
+	description := blogPayload.Description
+	content := blogPayload.Content
 
 	_, err = db.Exec("INSERT INTO posts (title, description, content) VALUES (?, ?, ?)", title, description, content)
 	if err != nil {
